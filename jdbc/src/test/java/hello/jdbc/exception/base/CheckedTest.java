@@ -1,4 +1,4 @@
-package hello.jdbc.exception;
+package hello.jdbc.exception.base;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
