@@ -19,6 +19,9 @@ class ItemRepositoryTest {
     @Autowired
     ItemRepository itemRepository;
 
+    /**
+     * 각 테스트가 끝나면 호출
+     */
     @AfterEach
     void afterEach() {
         //MemoryItemRepository 의 경우 제한적으로 사용
