@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Profile;
  * @SpringBootApplication(scanBasePackages = "hello.itemservice.web")
  * - 특정 패키지 경로만 컴포넌트 스캔을 할 경우 경로 설정
  */
-@Import(JdbcTemplateV1Config.class)
+@Import(JdbcTemplateV2Config.class)
 @SpringBootApplication(scanBasePackages = "hello.itemservice.web")
 public class ItemServiceApplication {
 
