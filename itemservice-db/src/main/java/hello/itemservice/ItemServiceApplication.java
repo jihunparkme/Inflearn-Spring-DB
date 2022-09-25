@@ -20,7 +20,7 @@ import javax.sql.DataSource;
  * - 특정 패키지 경로만 컴포넌트 스캔을 할 경우 경로 설정
  */
 @Slf4j
-@Import(JdbcTemplateV3Config.class)
+@Import(MyBatisConfig.class)
 @SpringBootApplication(scanBasePackages = "hello.itemservice.web")
 public class ItemServiceApplication {
 
