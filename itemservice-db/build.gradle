@@ -21,9 +21,8 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-
-	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	runtimeOnly 'com.h2database:h2'
+//	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	/**
 	 * MyBatis 추가 - Spring 이 공식적으로 관리하지 않는 라이브러리는 버전 정보 필요
 	 *
@@ -33,6 +32,14 @@ dependencies {
 	 * mybatis : MyBatis 라이브러리
 	 */
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0'
+	/**
+	 * JPA, Spring Data JPA - JPA, Spring Data JPA 를 Spring Boot 와 통합
+	 *
+	 * hibernate-core : JPA 구현체인 하이버네이트 라이브러리
+	 * jakarta.persistence-api : JPA 인터페이스
+	 * spring-data-jpa : 스프링 데이터 JPA 라이브러리
+	 */
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
