@@ -72,4 +72,50 @@ public class BasicTxTest {
         txManager.rollback(status);
         log.info("트랜잭션 롤백 완료");
     }
+
+    @Test
+    void double_commit() {
+        log.info("트랜잭션1 시작");
+        /**
+         * Creating new transaction with name [null]
+         * Acquired Connection [HikariProxyConnection@2120431435 wrapping conn0: ...] for JDBC transaction -> 트랜잭션1 시작, 커넥션 풀에서 conn0 커넥션 획득
+         * Switching JDBC Connection [HikariProxyConnection@2120431435 wrapping conn0: ...] to manual commit
+         */
+        TransactionStatus tx1 = txManager.getTransaction(new DefaultTransactionAttribute());
+        log.info("트랜잭션1 커밋");
+        /**
+         * Initiating transaction commit
+         * Committing JDBC transaction on Connection [HikariProxyConnection@2120431435 wrapping conn0: ...]
+         * Releasing JDBC Connection [HikariProxyConnection@2120431435 wrapping conn0: ...] after transaction -> 트랜잭션1 커밋, 커넥션 풀에 conn0 커넥션 반납
+         */
+        txManager.commit(tx1);
+
+        log.info("트랜잭션2 시작");
+        /**
+         * Creating new transaction with name [null]
+         * Acquired Connection [HikariProxyConnection@1567077043 wrapping conn0: ...] for JDBC transaction -> 트랜잭션2 시작, 커넥션 풀에서 conn0 커넥션 획득
+         * Switching JDBC Connection [HikariProxyConnection@1567077043 wrapping conn0: ...] to manual commit -> 트랜잭션2 커밋, 커넥션 풀에 conn0 커넥션 반납
+         */
+        TransactionStatus tx2 = txManager.getTransaction(new DefaultTransactionAttribute());
+        log.info("트랜잭션2 커밋");
+        /**
+         * Initiating transaction commit
+         * Committing JDBC transaction on Connection [HikariProxyConnection@1567077043 wrapping conn0: ...]
+         * Releasing JDBC Connection [HikariProxyConnection@1567077043 wrapping conn0: ...] after transaction
+         */
+        txManager.commit(tx2);
+    }
+
+    @Test
+    void double_commit_rollback() {
+        log.info("트랜잭션1 시작");
+        TransactionStatus tx1 = txManager.getTransaction(new DefaultTransactionAttribute());
+        log.info("트랜잭션1 커밋");
+        txManager.commit(tx1);
+
+        log.info("트랜잭션2 시작");
+        TransactionStatus tx2 = txManager.getTransaction(new DefaultTransactionAttribute());
+        log.info("트랜잭션2 롤백");
+        txManager.rollback(tx2);
+    }
 }
