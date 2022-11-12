@@ -1,8 +1,7 @@
 package hello.springtx.order;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,8 +39,7 @@ class OrderServiceTest {
         Order order = new Order();
         order.setUsername("예외");
         //when, then
-        assertThatThrownBy(() -> orderService.order(order))
-                .isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> orderService.order(order)).isInstanceOf(RuntimeException.class);
         //then: 롤백되었으므로 데이터가 없어야 한다.
         Optional<Order> orderOptional = orderRepository.findById(order.getId());
         assertThat(orderOptional.isEmpty()).isTrue();
@@ -55,7 +53,7 @@ class OrderServiceTest {
         //when
         try {
             orderService.order(order);
-            fail("잔고 부족 예외가 발생해야 합니다.");
+            Assertions.fail("잔고 부족 예외가 발생해야 합니다.");
         } catch (NotEnoughMoneyException e) {
             log.info("고객에게 잔고 부족을 알리고 별도의 계좌로 입금하도록 안내");
         }
