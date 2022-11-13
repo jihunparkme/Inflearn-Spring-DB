@@ -118,4 +118,39 @@ public class BasicTxTest {
         log.info("트랜잭션2 롤백");
         txManager.rollback(tx2);
     }
+
+    @Test
+    void inner_commit() {
+        /**
+         * Creating new transaction with name [null]
+         * ...
+         * Switching JDBC Connection [..] to manual commit => on auto commit
+         * outer.isNewTransaction()=true
+         */
+        log.info("외부 트랜잭션 시작");
+        TransactionStatus outer = txManager.getTransaction(new DefaultTransactionAttribute());
+        log.info("outer.isNewTransaction()={}", outer.isNewTransaction());
+
+        /**
+         * Participating in existing transaction => 외부 트랜잭션에 참여
+         * inner.isNewTransaction()=false
+         */
+        log.info("내부 트랜잭션 추가 시작 (외부 트랜잭션에 참여)");
+        TransactionStatus inner = txManager.getTransaction(new DefaultTransactionAttribute());
+        log.info("inner.isNewTransaction()={}", inner.isNewTransaction());
+
+        /**
+         * nothing
+         */
+        log.info("내부 트랜잭션 커밋");
+        txManager.commit(inner);
+
+        /**
+         * Initiating transaction commit
+         * Committing JDBC transaction on Connection
+         * Releasing JDBC Connection
+         */
+        log.info("외부 트랜잭션 커밋");
+        txManager.commit(outer);
+    }
 }
