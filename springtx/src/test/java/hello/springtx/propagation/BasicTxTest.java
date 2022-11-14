@@ -153,4 +153,31 @@ public class BasicTxTest {
         log.info("외부 트랜잭션 커밋");
         txManager.commit(outer);
     }
+
+    @Test
+    void outer_rollback() {
+        /**
+         * Creating new transaction with name
+         * Acquired Connection [...] for JDBC transaction
+         * Switching JDBC Connection [...] to manual commit
+         */
+        log.info("외부 트랜잭션 시작");
+        TransactionStatus outer = txManager.getTransaction(new DefaultTransactionAttribute());
+
+        /**
+         * Participating in existing transaction
+         */
+        log.info("내부 트랜잭션 시작");
+        TransactionStatus inner = txManager.getTransaction(new DefaultTransactionAttribute());
+        log.info("내부 트랜잭션 커밋");
+        txManager.commit(inner);
+
+        /**
+         * Initiating transaction rollback
+         * Rolling back JDBC transaction on Connection
+         * Releasing JDBC Connection [...] after transaction
+         */
+        log.info("외부 트랜잭션 롤백");
+        txManager.rollback(outer);
+    }
 }
