@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
@@ -214,5 +215,51 @@ public class BasicTxTest {
         log.info("외부 트랜잭션 커밋");
         assertThatThrownBy(() -> txManager.commit(outer))
                 .isInstanceOf(UnexpectedRollbackException.class);
+    }
+
+    @Test
+    void inner_rollback_requires_new() {
+        /**
+         * 외부 트랜잭션 시작
+         * Creating new transaction with name
+         * Acquired Connection [HikariProxyConnection@1650943741 wrapping conn0: ...] for JDBC transaction
+         * Switching JDBC Connection [HikariProxyConnection@1650943741 wrapping conn0: ...] to manual commit
+         * outer.isNewTransaction()=true
+         */
+        log.info("외부 트랜잭션 시작");
+        TransactionStatus outer = txManager.getTransaction(new DefaultTransactionAttribute());
+        log.info("outer.isNewTransaction()={}", outer.isNewTransaction());
+
+        /**
+         * 내부 트랜잭션 시작
+         * "Suspending current transaction, creating new transaction with name"
+         * Acquired Connection [HikariProxyConnection@1281445260 wrapping conn1: ...] for JDBC transaction
+         * Switching JDBC Connection [HikariProxyConnection@1281445260 wrapping conn1: ...] to manual commit
+         * inner.isNewTransaction()=true
+         */
+        log.info("내부 트랜잭션 시작");
+        DefaultTransactionAttribute definition = new DefaultTransactionAttribute();
+        definition.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus inner = txManager.getTransaction(definition);
+        log.info("inner.isNewTransaction()={}", inner.isNewTransaction());
+
+        /**
+         * 내부 트랜잭션 롤백
+         * Initiating transaction rollback
+         * Rolling back JDBC transaction on Connection [HikariProxyConnection@1281445260 wrapping conn1: ...]
+         * Releasing JDBC Connection [HikariProxyConnection@1281445260 wrapping conn1: ...] after transaction
+         * "Resuming suspended transaction after completion of inner transaction"
+         */
+        log.info("내부 트랜잭션 롤백");
+        txManager.rollback(inner);
+
+        /**
+         * 외부 트랜잭션 커밋
+         * Initiating transaction commit
+         * Committing JDBC transaction on Connection [HikariProxyConnection@1650943741 wrapping conn0: ...]
+         * Releasing JDBC Connection [HikariProxyConnection@1650943741 wrapping conn0: ...] after transaction
+         */
+        log.info("외부 트랜잭션 커밋");
+        txManager.commit(outer);
     }
 }
