@@ -21,8 +21,8 @@ class MemberServiceTest {
 
     /**
      * MemberService    @Transactional:OFF
-     * MemberRepository @Transactional:ON
-     * LogRepository    @Transactional:ON
+     * MemberRepository @Transactional:ON - 트랜잭션 A
+     * LogRepository    @Transactional:ON - 트랜잭션 B
      */
     @Test
     void outer_transaction_Off_success() {
@@ -39,8 +39,8 @@ class MemberServiceTest {
 
     /**
      * MemberService    @Transactional:OFF
-     * MemberRepository @Transactional:ON
-     * LogRepository    @Transactional:ON Exception
+     * MemberRepository @Transactional:ON - 트랜잭션 A
+     * LogRepository    @Transactional:ON - 트랜잭션 B / Exception
      */
     @Test
     void outer_transaction_Off_fail() {
@@ -55,5 +55,24 @@ class MemberServiceTest {
         // memberRepository -> COMMIT, logRepository -> ROLLBACK
         assertTrue(memberRepository.find(username).isPresent());
         assertTrue(logRepository.find(username).isEmpty());
+    }
+
+    /**
+     * 모두 하나의 트랜잭션 범위 - 트랜잭션 A
+     * MemberService    @Transactional:ON
+     * MemberRepository @Transactional:OFF
+     * LogRepository    @Transactional:OFF
+     */
+    @Test
+    void single_transaction() {
+        //given
+        String username = "singleTx";
+
+        //when
+        memberService.joinV1(username);
+
+        //then: 모든 데이터가 정상 저장된다.
+        assertTrue(memberRepository.find(username).isPresent());
+        assertTrue(logRepository.find(username).isPresent());
     }
 }
